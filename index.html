@@ -1,0 +1,317 @@
+
+<html>
+<head>
+<title> Example Intro Page </title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body onload="start()">
+<!-- 
+Hack Game
+Guess the five-digit password within ten rounds.
+Gameplay: The game provides a text area for output, an input area for the player to enter guesses, and buttons for actions such as guessing, clearing the input, and resetting the game.
+You can enter A/a to view the answer
+ -->
+
+
+
+	<table border=1 align=center width=600 height=600 >
+		<tr height=120> <!-- row 1 -->
+			<td width=20% id="topLeft"></td>
+			<td width=60% align=center><h1>  Hack game	</h1>  	</td>
+			<td width=20% id="topRight"></td>
+		</tr>
+		<tr> <!-- row 2 -->
+			<td id = "left"> Rounds:0		</td>
+			<td>  
+				<table width=100% height=100% border=0>
+				 <tr height = 100%>
+					<td>	
+						<p>Main Game Part:</p>
+						<textarea id="output" name="output" rows="40" cols=50" readonly=true > Welcome!</textarea>
+					</td>
+				 </tr>
+				 <tr>
+
+				 </tr>
+				 </table>
+			</td>
+			<td id="right">  Rounds:0	</td>
+		</tr>
+		<tr > <!-- row 3 -->
+			<td colspan=3 align=center>
+				<label for="inText">Input Text Here</label>
+				<input type="text" id="input" name="inText" maxlength="5">
+				<br />
+				<br />
+				<button onclick="clicked()" id="mainButton"> start </button>
+				<button onclick="clearText()"> Clear </button>
+				<button onclick = "reset()"> Reset</button>
+				
+			</td>
+		</tr>
+	</table>
+	
+	<script>
+		var mainText;
+		var inputText;
+		var mainButton;
+		var name;
+
+		// game control booleans / flags
+		var welcome;
+		var gameRunning;
+		var score;
+		var randomColor;
+		// guessing game variables
+		var secret;
+		var guess;
+		var guessCount;
+		var guessNumber;
+		var round = 0;
+		//use for user answer and redom answer
+		var answer; 
+		var userAnswer;
+		var uAnswer=[-1,-1,-1,-1,-1];;
+		var answer=[-1,-1,-1,-1,-1];
+		//start part of the gaem
+
+		function start() {
+			welcome = true;
+			gameRunning = false;
+			mainButton = document.getElementById("mainButton");
+			mainText = document.getElementById("output");
+			inputText = document.getElementById("input");
+			mainButton.innerHTML = "GO";
+			clearText();
+			println("Welcome! Please enter your name and click start.");
+		}
+	
+		function println(textSource){
+			mainText.value += "\n" + textSource;
+		}
+		
+		function print(textSource){
+			mainText.value += textSource;
+		}	
+		
+		function clearText (){
+			inputText.value = "";
+			
+		}
+	
+		function clicked () {
+			// if I'm currently in the "welcome" state
+			if (welcome){
+				welcome = false;
+				name = inputText.value;
+				println("Hello " + name + ". Welcome to my Game!");
+				mainButton.innerHTML = "Guess";
+				game();
+			} else {
+				println("Past the welcome state... what's next " );
+			}
+		}
+		
+		
+		
+		// This version uses events, a bit more to think about,
+		// but also far more options and potential. This version starts
+		// by setting up some values, and then waits for the user to
+		// do something (events).
+		function game () {
+			guessNumber = 0;
+			secret = randomNumber();
+			rAnswer(secret, "answer");
+			println("This computer is set with a unique five-digit password that you need to guess within ten rounds to hack in.");
+			println("");
+			
+			mainButton.innerHTML = "Guess";
+			mainButton.onclick = guess;
+			
+		}
+		
+		function guess () {
+			var userAnswer = inputText.value;
+			//answer
+			if (userAnswer == "A"||userAnswer == "a"){
+					println("answer " + secret);
+				}
+			// invalid guess ==> above function wouild return "zzz"
+			// to let this function know that the operation failed
+			// get the value that the user typed in the text box
+
+			let result = parseInt (userAnswer);
+			// now reset the text box to be clear for next time
+			inputText.value = "";
+			if (Number.isNaN(result)){
+				println("Not a number. Try again.");
+			}
+			else {
+				ukAnswer(userAnswer, "numberString");
+				println(userAnswer)
+				check();
+				
+			}
+
+
+
+		}
+
+		//reset game 
+		function reset(){
+			round = 0
+			mainButton.onclick = clicked;
+			document.getElementById("left").innerHTML=("Rounds:"+round);
+			document.getElementById("right").innerHTML=("Rounds:"+round);
+			mainText.value = "";
+			document.getElementById("left").style.backgroundColor = "white";
+			document.getElementById("right").style.backgroundColor = "white";
+			document.getElementById("topRight").style.backgroundColor = "white";
+			document.getElementById("topLeft").style.backgroundColor = "white";
+			document.getElementById("topLeft").innerHTML = "";
+			document.getElementById("topRight").innerHTML = "";
+			document.getElementById("left").innerHTML = "Rounds:0";
+			document.getElementById("right").innerHTML = "Rounds:0";
+			start();
+
+		}
+
+			
+    // seperate user answer to 5 number
+    	function ukAnswer(number, containerId) {
+			uAnswer = number.toString();
+			uAnswer =(uAnswer.split(''));
+			console.log(uAnswer)
+			
+    	}
+		//seperate answer to 5 number
+		function rAnswer (number, containerId) {
+			answer = number.toString();
+			answer =(answer.split(''));
+			console.log(answer)
+			
+    	}
+		//Chick each number one by one 
+		function check() {
+    		var uNumberLength = 0;
+			var numberChange = 0;
+			score = 0;
+			while (uNumberLength < 5) {
+				var userAnswerChick = uAnswer[uNumberLength];
+				var sequence = uNumberLength+1
+				var isCorrectPosition = false;
+				var isPresentWrongPosition = false;
+				var isNotPresent = true;
+				for (var aNumberLength = 0, currentAnswerChick; aNumberLength < 5; aNumberLength++) {
+					currentAnswerChick = answer[aNumberLength];
+
+					if (currentAnswerChick == userAnswerChick && uNumberLength == aNumberLength) {
+						println("The "+sequence+"th digit of the number is correct ");
+						println("")
+						isCorrectPosition = true;
+						isNotPresent = false;
+						score ++
+						break;
+					} else if (currentAnswerChick == userAnswerChick) {
+						isPresentWrongPosition = true;
+						isNotPresent = false;
+					}
+				}
+
+				if (isCorrectPosition) {
+					// Do nothing, already printed correct position message
+				} else if (isPresentWrongPosition) {
+					println("The "+sequence+"th digit of the number is in it but in the wrong position");
+					println("")
+				} else if (isNotPresent) {
+					println("The "+ sequence +"th digit is not in it.");
+					println("")
+				}
+
+				uNumberLength++;
+				numberChange++;
+
+			}
+			guessNumber++
+			round++
+			document.getElementById("left").innerHTML=("Rounds:"+round);
+			document.getElementById("right").innerHTML=("Rounds:"+round);
+			if(score == 5||round ==10){
+				gameOver();
+			}
+		}
+
+
+
+
+
+
+
+		function gameOver (){
+			if (score == 5){ // WIN:
+				println("You got it on guess " + guessNumber);
+				
+				// Change the Top Left and Top Right 
+				// parts of the table to show winning.
+				document.getElementById("topLeft").innerHTML = "HACKED IN";
+				document.getElementById("topRight").innerHTML = "HACKED IN";
+				document.getElementById("topRight").style.backgroundColor = "green";
+				document.getElementById("topLeft").style.backgroundColor = "green";
+
+				document.getElementById("topLeft").innerHTML = "HACKED IN";
+				document.getElementById("topRight").innerHTML = "HACKED IN";
+				document.getElementById("topRight").style.backgroundColor = "green";
+				document.getElementById("topLeft").style.backgroundColor = "green";
+			} else { // LOSE:
+				println("You did not get it. The answer was " + secret);
+				
+				// Change the Top Left and Top Right 
+				// parts of the table to show winning.
+				document.getElementById("topRight").innerHTML = "BE FOUND";
+				document.getElementById("topLeft").innerHTML = "BE FOUND";
+				document.getElementById("topRight").style.backgroundColor = "blue";
+				document.getElementById("topLeft").style.backgroundColor = "red";
+
+				document.getElementById("left").innerHTML = "BE FOUND";
+				document.getElementById("right").innerHTML = "BE FOUND";
+				document.getElementById("left").style.backgroundColor = "blue";
+				document.getElementById("right").style.backgroundColor = "red";
+			}
+
+		}
+		/**
+		 *  Provided to make user input just like CodeHS possible.
+		 *  (for Strings / Text) - also used by readInt() and readFloat()
+		 */
+		function readLine (promptText){
+			return prompt(promptText);
+		}
+		
+
+		
+		//get a no repeating five number.
+		
+		function randomNumber() {
+			let digits = [...Array(10)].map((_, i) => i); // Array of digits from 0 to 9
+			for (let i = digits.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[digits[i], digits[j]] = [digits[j], digits[i]]; 
+			}
+			//back to number
+			let uniqueNumber = parseInt(digits.slice(0, 5).join(''), 10);
+
+			// chick repeating
+			if (uniqueNumber < 10000) {
+				return randomNumber(); 
+			} else {
+				return uniqueNumber;
+			}
+		}
+
+
+
+
+	</script>
+</body>
+</html>
